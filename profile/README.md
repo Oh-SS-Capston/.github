@@ -4,19 +4,19 @@
 
 Oh! SS는 GitHub Repository를 분석하여 **Repository 구조, 클래스 및 코드 관계, Public API, 개발 규칙, 라이선스 정보와 Evidence**를 구조화하고 시각화합니다.
 
-Oh! SS는 Repository 전체를 LLM에게 직접 전달하여 추측하도록 하지 않습니다. 먼저 **JavaParser·ASM 기반 정적 분석과 Graph 분석을 통해 코드에서 확인 가능한 사실 정보를 추출하고**, 구조화된 분석 결과를 **로컬 Ollama 기반 Qwen3.5 9B**가 개발자가 이해하기 쉬운 설명으로 변환합니다.
+Repository 전체를 LLM에게 직접 전달해 구조를 추측하도록 하는 대신, **JavaParser·ASM 기반 정적 분석과 Graph 분석을 통해 코드에서 확인 가능한 정보를 먼저 추출**합니다. 이후 구조화된 분석 결과와 Evidence를 **로컬 Ollama 기반 Qwen3.5 9B**가 개발자가 이해하기 쉬운 형태로 설명합니다.
 
-🌐 **Demonstration video:** https://youtu.be/IeMdvZ4GfUI?si=mKXN8fdu1FQaGOI3
+🎥 **Demonstration Video:** https://youtu.be/IeMdvZ4GfUI
 
 <p align="center">
-  <img src="./assets/example.png" alt="Oh! SS Full screen" width="1000">
+  <img src="./assets/example.png" alt="Oh! SS Analysis Result" width="1000">
 </p>
 
 ---
 
 ## Why Oh! SS?
 
-새로운 오픈소스 프로젝트에 참여하는 개발자는 코드를 수정하기 전에 다음 정보를 직접 파악해야 합니다.
+새로운 오픈소스 프로젝트에 참여하는 개발자는 실제 코드를 수정하기 전에 다음 정보를 파악해야 합니다.
 
 * Repository 및 디렉터리 구조
 * 주요 Package·Class·Method
@@ -26,9 +26,9 @@ Oh! SS는 Repository 전체를 LLM에게 직접 전달하여 추측하도록 하
 * 적용된 오픈소스 라이선스
 * 분석 결과를 뒷받침하는 실제 코드 및 문서 근거
 
-Repository 규모가 커질수록 이러한 정보를 여러 소스 파일과 문서에서 직접 파악하는 데 많은 시간이 필요합니다.
+Repository의 규모가 커질수록 이러한 정보를 여러 소스 파일과 문서에서 직접 탐색하는 데 많은 시간이 필요합니다.
 
-Oh! SS는 이러한 초기 탐색 과정을 자동화하여 **Repository의 구조와 개발 맥락을 정형화된 분석 산출물로 생성하고, 사용자가 이를 웹에서 탐색할 수 있도록 지원합니다.**
+Oh! SS는 이러한 초기 탐색 과정을 지원하기 위해 Repository를 정적으로 분석하고, **구조와 개발 맥락을 구조화된 산출물로 생성하여 웹에서 탐색할 수 있도록 제공합니다.**
 
 ---
 
@@ -68,13 +68,13 @@ GitHub Repository URL 또는 `owner/repository` 형식으로 분석을 실행합
 * 코드 요소 간 Relationship
 * Subsystem 단위 구조 탐색
 
-Graph 기반 구조 분석에는 Leiden Network Analysis를 활용합니다.
+Graph 기반 구조 분석에는 **Leiden Network Analysis**를 활용합니다.
 
 ---
 
 ## 4. Public API 분석
 
-Repository의 Public API 정보를 분석합니다.
+Repository의 Public API 정보를 분석하고 관련 코드 및 근거를 제공합니다.
 
 * Public API 탐색
 * 관련 Class / Method
@@ -87,7 +87,7 @@ Repository의 Public API 정보를 분석합니다.
 
 프로젝트에서 확인되는 개발 규칙과 관련 근거를 분석합니다.
 
-Oh! SS는 단순한 생성 결과뿐 아니라 가능한 경우 해당 판단과 연결되는 실제 코드 또는 문서 정보를 함께 제공합니다.
+분석 결과만 제공하는 것이 아니라 가능한 경우 해당 판단과 연결되는 **Source File, Code Location, Document Evidence**를 함께 제공합니다.
 
 ```text
 Analysis Result
@@ -102,33 +102,29 @@ Analysis Result
 
 ## 6. AI 기반 분석 설명
 
-Oh! SS의 기본 LLM Provider는 **Ollama**이며, 기본 모델은 **Qwen3.5 9B**입니다.
-
-분석 과정은 다음과 같습니다.
+기본 LLM Runtime은 **Ollama**, 기본 모델은 **Qwen3.5 9B**입니다.
 
 ```text
 Repository
     ↓
 Static Analysis
     ↓
-Structured Result
+Structured Result / Evidence
     ↓
-Evidence
-    ↓
-Qwen3.5 9B
+Ollama + Qwen3.5 9B
     ↓
 Developer-oriented Explanation
 ```
 
-LLM은 Repository 구조를 임의로 생성하는 것이 아니라, 앞선 분석 Pipeline에서 생성된 구조화 정보를 기반으로 설명을 생성합니다.
+LLM은 Repository의 구조를 대신 생성하는 분석기가 아니라, 앞선 분석 Pipeline에서 생성된 구조화된 결과를 기반으로 설명을 생성하는 계층으로 사용합니다.
 
-LLM Scenario 생성에서는 서버가 분석 결과를 기반으로 Scenario의 골격을 먼저 구성하고, 모델은 해당 구조의 설명 필드를 생성하도록 제한하여 분석 근거와 생성 결과의 연결을 유지합니다.
+Scenario 생성에서도 Backend가 분석 결과를 기반으로 기본 구조를 구성하고, LLM은 해당 구조의 설명을 보완하는 방식으로 분석 결과와 생성 결과의 연결을 유지합니다.
 
 ---
 
 ## 7. 라이선스 분석
 
-Repository의 오픈소스 라이선스 관련 정보를 분석합니다.
+Repository의 오픈소스 라이선스 관련 정보를 분석하고 검토를 지원합니다.
 
 * License 식별
 * 주요 License Metric
@@ -137,7 +133,7 @@ Repository의 오픈소스 라이선스 관련 정보를 분석합니다.
 * Review Checklist
 * Markdown / JSON Report
 
-> Oh! SS의 라이선스 분석 결과는 법률 자문이 아니며, 개발자의 오픈소스 라이선스 검토를 지원하기 위한 정보입니다.
+> Oh! SS의 라이선스 분석 결과는 법률 자문을 대체하지 않으며, 개발자의 오픈소스 라이선스 검토를 지원하기 위한 정보입니다.
 
 ---
 
@@ -154,47 +150,7 @@ GitHub Repository의 활동 정보를 시각화합니다.
 
 # Analysis Architecture
 
-```text
-GitHub Repository
-        │
-        ▼
-Repository Collection
-        │
-        ▼
-Source / Build Analysis
-        │
-        ▼
-Static Analysis
-(JavaParser / ASM)
-        │
-        ▼
-Symbol & Relationship Extraction
-        │
-        ▼
-Graph Construction
-        │
-        ▼
-Structure Analysis
-        │
-        ├── Directory Structure
-        ├── Class Relationships
-        ├── Public API
-        ├── Rules & Evidence
-        └── License Information
-        │
-        ▼
-Structured Analysis Artifacts
-        │
-        ▼
-Ollama
-(Qwen3.5 9B)
-        │
-        ▼
-LLM-generated Documentation
-        │
-        ▼
-Oh! SS Web Interface
-```
+Oh! SS는 **정적 분석 → 구조화된 분석 산출물 → LLM 설명** 순서로 Repository를 처리합니다.
 
 <p align="center">
   <img src="./assets/architecture.png" alt="Oh! SS Architecture" width="1000">
@@ -206,58 +162,61 @@ Oh! SS Web Interface
 
 ## Static Analysis First
 
-Oh! SS는 LLM 분석 전에 코드에서 확인 가능한 정보를 먼저 추출합니다.
+LLM 실행 전에 Repository의 Source 및 Bytecode에서 확인할 수 있는 정보를 먼저 분석합니다.
 
 Java Repository 분석에는 다음 기술을 활용합니다.
 
-* JavaParser Symbol Solver
-* ASM
+* **JavaParser Symbol Solver** — Java Source 및 Symbol 관계 분석
+* **ASM** — Java Bytecode 분석
 
-이를 통해 Source 및 Bytecode 수준에서 코드 구조와 관계 정보를 분석합니다.
+이를 통해 Package, Class, Method, Symbol 및 코드 요소 간 관계를 구조화합니다.
 
 ---
 
 ## Graph-based Structure Analysis
 
-추출된 Symbol과 Relationship을 Graph 형태로 구성하고 Repository의 구조적 관계 분석에 활용합니다.
+추출된 Symbol과 Relationship을 Graph 형태로 구성하여 Repository 내부의 구조적 관계를 분석합니다.
 
-Graph 분석 결과는 Class Map 및 Subsystem 분석 등의 기반 데이터로 사용됩니다.
+Graph 분석 결과는 다음 기능의 기반 데이터로 사용됩니다.
+
+* Class Relationship
+* Class Map
+* Subsystem Analysis
+* Repository Structure Exploration
 
 ---
 
 ## Evidence-grounded Analysis
 
-분석 결과가 어떤 Source 또는 문서 정보에서 도출되었는지 확인할 수 있도록 Evidence 정보를 연결합니다.
+분석 결과가 어떤 Source Code 또는 문서에서 도출되었는지 확인할 수 있도록 Evidence 정보를 연결합니다.
 
-이는 LLM이 생성한 설명의 기반 데이터를 사용자가 다시 원본 Repository에서 확인할 수 있도록 하기 위한 구조입니다.
+이를 통해 사용자가 생성된 결과를 그대로 받아들이는 것이 아니라, **원본 Repository를 기준으로 분석 결과를 다시 확인할 수 있도록 지원합니다.**
 
 ---
 
 ## Local Open-weight LLM
 
-Oh! SS의 기본 LLM 실행 환경은 외부 상용 API가 아니라 **Ollama 기반 로컬 모델 실행**입니다.
-
-기본 모델:
+기본 AI 분석 경로에서는 외부 상용 API가 아닌 **Ollama 기반 로컬 오픈웨이트 모델**을 사용합니다.
 
 ```text
-Qwen3.5 9B
+Runtime : Ollama
+Model   : Qwen3.5 9B
+License : Apache-2.0
 ```
 
-Docker Compose 환경에서는 Ollama 서비스와 모델 초기화 서비스가 함께 구성되며, 최초 실행 시 모델을 내려받은 뒤 Backend가 실행됩니다.
-
-Qwen3.5 9B는 Apache License 2.0으로 공개된 모델입니다.
+Docker Compose 환경에서는 Ollama와 모델 초기화 서비스를 함께 구성하여 Qwen3.5 9B를 로컬에서 실행합니다.
 
 ---
 
 ## Reproducible LLM Generation
 
-LLM 생성 설정에서는 고정 Seed를 지원하여 동일 입력에 대한 모델 출력 변동을 줄일 수 있도록 구성합니다.
+LLM 생성 설정은 고정 Seed 사용을 지원하여 동일한 입력과 설정에서 출력 변동을 줄일 수 있도록 구성합니다.
 
-또한 Scenario 생성은 전체 내용을 모델에게 자유 생성시키지 않고, Backend가 먼저 Scenario 골격을 생성한 후 모델이 설명 필드를 보완하는 방식으로 구성합니다.
+Scenario 생성 역시 전체 내용을 LLM이 자유롭게 구성하도록 하지 않고, Backend가 분석 결과를 기반으로 Scenario 구조를 생성한 뒤 모델이 설명을 보완하는 방식으로 구성합니다.
 
 ---
 
-# 기술 스택
+# Tech Stack
 
 ## Frontend
 
@@ -296,7 +255,6 @@ LLM 생성 설정에서는 고정 Seed를 지원하여 동일 입력에 대한 �
 | Local LLM Runtime | Ollama     |
 | Default Model     | Qwen3.5 9B |
 | Model License     | Apache-2.0 |
-| Optional Provider | Claude     |
 
 ## Infrastructure
 
@@ -309,17 +267,43 @@ LLM 생성 설정에서는 고정 Seed를 지원하여 동일 입력에 대한 �
 
 # Repository
 
+Oh! SS는 Frontend와 Backend를 독립된 Repository로 관리합니다.
+
 ## Frontend
 
-https://github.com/Oh-SS-Capston/FE
+**Repository:** https://github.com/Oh-SS-Capston/FE
 
 사용자 인터페이스와 분석 결과 탐색 및 시각화를 담당합니다.
 
+주요 역할:
+
+* Repository 분석 요청
+* 분석 진행 상태 확인
+* 코드 구조 탐색
+* Class Diagram / Class Map
+* Public API / Rule / Evidence 조회
+* AI 분석 결과 조회
+* 라이선스 분석
+* GitHub 통계
+
 ## Backend / Analysis Engine
 
-https://github.com/Oh-SS-Capston/BE
+**Repository:** https://github.com/Oh-SS-Capston/BE
 
-Repository 분석 Pipeline, LLM Pipeline 및 Backend API를 담당합니다.
+Repository 분석 Pipeline과 Backend API를 담당합니다.
+
+주요 역할:
+
+* Repository Collection
+* Build / Source Analysis
+* Static Analysis
+* Symbol & Relationship Extraction
+* Graph / Cluster Analysis
+* Public API Analysis
+* Rule & Evidence Analysis
+* License Analysis
+* LLM Pipeline
+* Structured Artifact 관리
 
 ---
 
@@ -327,21 +311,26 @@ Repository 분석 Pipeline, LLM Pipeline 및 Backend API를 담당합니다.
 
 ## Frontend
 
+### Requirements
+
+* Node.js
+* npm
+
 ```bash
 git clone https://github.com/Oh-SS-Capston/FE.git
 cd FE
 
-npm install
+npm ci
 npm run dev
 ```
 
-기본 Backend 주소:
+기본 Backend API 주소:
 
 ```text
 http://localhost:8080
 ```
 
-필요한 경우:
+필요한 경우 환경 변수로 변경할 수 있습니다.
 
 ```env
 VITE_API_BASE_URL=http://localhost:8080
@@ -363,8 +352,6 @@ npm run build
 * PostgreSQL
 * Docker / Docker Compose 권장
 
-Repository Clone:
-
 ```bash
 git clone https://github.com/Oh-SS-Capston/BE.git
 cd BE
@@ -372,14 +359,18 @@ cd BE
 
 ### Docker Compose
 
+Docker Compose 환경에서는 다음 서비스를 구성합니다.
+
 * Backend Application
 * Redis
 * Ollama
-* Qwen3.5 9B model initialization
+* Qwen3.5 9B Model Initialization
 
 ```bash
 docker compose up --build
 ```
+
+> PostgreSQL 연결과 Google OAuth, AWS 등 애플리케이션 실행에 필요한 환경 변수는 별도로 구성해야 합니다. 실제 Secret 값은 Repository에 포함하지 않습니다.
 
 기본 Application 주소:
 
@@ -392,8 +383,6 @@ Swagger UI:
 ```text
 http://localhost:8080/swagger-ui/index.html
 ```
-
-> PostgreSQL 연결과 Google OAuth, AWS 등의 환경 변수는 별도로 설정해야 합니다.
 
 ### Direct Run
 
@@ -425,16 +414,58 @@ macOS / Linux:
 
 ---
 
+# Verification
+
+최종 제출 버전은 다음 항목을 기준으로 검증합니다.
+
+### Backend
+
+```bash
+./gradlew clean test
+./gradlew clean bootJar
+```
+
+### Frontend
+
+```bash
+npm ci
+npm run build
+```
+
+### End-to-End
+
+```text
+Repository Input
+        ↓
+Repository Collection
+        ↓
+Static Analysis
+        ↓
+Graph / Structure Analysis
+        ↓
+Public API / Rule / Evidence
+        ↓
+Ollama + Qwen3.5 9B
+        ↓
+Structured Analysis Result
+        ↓
+Frontend Visualization
+```
+
+최종 Release 생성 전 위 Pipeline을 실제 공개 Repository를 대상으로 다시 검증합니다.
+
+---
+
 # Known Limitations
 
 현재 구현에서 확인된 주요 제약은 다음과 같습니다.
 
-* 로컬 Qwen3.5 9B 기반 LLM 단계는 CPU/실행 환경에 따라 상당한 시간이 필요할 수 있습니다.
-* LLM 실행 중 단일 Worker가 장시간 점유되어 후속 Job이 대기할 수 있습니다.
+* 로컬 Qwen3.5 9B의 추론 시간은 CPU·GPU·Memory 등 실행 환경에 따라 크게 달라질 수 있습니다.
+* 하나의 LLM Run이 Worker를 장시간 점유하는 경우 후속 Job이 대기할 수 있습니다.
 * 일부 Scenario Evidence에서 내부 Evidence ID가 표시되지 않을 수 있습니다.
-* Qwen3.5 9B 실행을 위해 충분한 Memory가 필요합니다.
+* Qwen3.5 9B를 로컬에서 실행하기 위해 충분한 Memory가 필요합니다.
 
-이러한 항목은 분석 결과의 정확성과 Repository 구조 분석 자체에는 영향을 주지 않는 범위에서 향후 개선할 예정입니다.
+이러한 제약은 현재 **LLM 처리 성능 및 일부 Evidence 표현 방식과 관련된 개선 대상**으로 관리하고 있습니다.
 
 ---
 
@@ -442,20 +473,23 @@ macOS / Linux:
 
 Oh! SS 자체 Source Code는 **Apache License 2.0**으로 배포합니다.
 
-주요 오픈소스 구성 요소와 모델은 각 원 저작자의 라이선스를 따릅니다.
+외부 오픈소스 라이브러리, Runtime 및 AI Model은 각 원 저작자의 라이선스를 따릅니다.
 
-주요 AI 구성:
+| Component  | Role              | License    |
+| ---------- | ----------------- | ---------- |
+| Ollama     | Local LLM Runtime | MIT        |
+| Qwen3.5 9B | Default LLM       | Apache-2.0 |
 
-| Component  | Role              | License        |
-| ---------- | ----------------- | -------------- |
-| Ollama     | Local LLM Runtime | 해당 프로젝트 원 라이선스 |
-| Qwen3.5 9B | Default LLM       | Apache-2.0     |
+전체 외부 의존성 정보는 각 Repository에서 확인할 수 있습니다.
 
-세부 외부 의존성 정보는 각 Repository의 `THIRD_PARTY_LICENSES.md`에서 관리합니다.
+* [Frontend THIRD_PARTY_LICENSES.md](https://github.com/Oh-SS-Capston/FE/blob/main/THIRD_PARTY_LICENSES.md)
+* [Backend THIRD_PARTY_LICENSES.md](https://github.com/Oh-SS-Capston/BE/blob/main/THIRD_PARTY_LICENSES.md)
 
 ---
 
 # Contributing
+
+Oh! SS는 Issue 및 Pull Request 기반으로 개발합니다.
 
 ```text
 Issue
@@ -471,6 +505,8 @@ Pull Request
 develop
 ```
 
+각 Repository의 개발 규칙과 세부 구현은 FE / BE README를 참고해주세요.
+
 ---
 
 # License
@@ -480,4 +516,3 @@ Oh! SS source code is licensed under the **Apache License 2.0**.
 Third-party libraries, runtimes, and AI models remain subject to their respective licenses.
 
 For details, see the `LICENSE` and `THIRD_PARTY_LICENSES.md` files in the Frontend and Backend repositories.
-
