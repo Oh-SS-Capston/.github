@@ -477,5 +477,7 @@ develop
 
 Oh! SS source code is licensed under the **Apache License 2.0**.
 
-See each Repository's `LICENSE` and `THIRD_PARTY_LICENSES.md` for details.
+Third-party libraries, runtimes, and AI models remain subject to their respective licenses.
+
+For details, see the `LICENSE` and `THIRD_PARTY_LICENSES.md` files in the Frontend and Backend repositories.
 
